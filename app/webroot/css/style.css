@@ -443,6 +443,57 @@ table tbody tr:hover td span.action-remove-from-playlist{
     cursor: pointer;
 }
 
+.left-panel {
+    background-color: #F8F8F8;
+    position: fixed;
+    height: calc(100% - 115px);
+    min-height: 450px;
+    width: 50px;
+    top: 115px;
+    left: -37px;
+    padding: 8px;
+    border-right: solid #E7E7E7 1px;
+    z-index: 800;
+    transition: left 0.3s ease 0s;
+}
+
+.left-panel:hover {
+    left: 0;
+}
+
+.alphabet {
+    padding-right: 5px;
+    height: 100%;
+    z-index: 850;
+}
+
+.alphabet ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    font-size: 100%;
+    height: 100%;
+}
+
+.alphabet ul li {
+    height: 3.85%;
+}
+
+.alphabet ul li:hover a{
+    background-color: #FFFFFF;
+    color: #1D77C2;
+}
+
+.alphabet ul li a {
+    text-decoration: none;
+    display: block;
+    vertical-align: middle;
+    height: 100%;
+    width: 100%;
+    color: #333;
+    line-height: 200%;
+}
+
 @media (min-width: 1200px) {
     .artist-view-title-cell {
         width: 301px;
