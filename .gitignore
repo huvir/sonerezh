@@ -5,6 +5,7 @@
 /app/tmp/tests
 /app/tmp/cache
 /app/tmp/logs
+/app/tmp/*.mp3
 /lib/Cake/Console/Templates/skel/tmp/
 /plugins
 /vendors

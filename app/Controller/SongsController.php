@@ -378,38 +378,61 @@ class SongsController extends AppController {
         $query = isset($this->request->query['q']) ? $this->request->query['q'] : false ;
 
         if ($query) {
+        
+            // build a multi word search instead of literal string match
+            // e.g. any field like first param AND any field like second param, etc
+            
+            $query_params = explode(" ", $query);
+            $band_condition = array('AND' => array());
+            
+            
+            foreach($query_params as $query_param)
+            {
+              $query_condition = array(
+                        'Song.title like'   => '%'.$query_param.'%',
+                        'Song.band like'    => '%'.$query_param.'%',
+                        'Song.artist like'  => '%'.$query_param.'%',
+                        'Song.album like'   => '%'.$query_param.'%'
+                        );
+                        
+              $band_condition['AND'][] = array('OR' => $query_condition);
+              
+            }
+            
             $this->Paginator->settings = array(
                 'Song' => array(
                     'fields'        => array('Song.band'),
                     'group'         => array('Song.band'),
-                    'limit'         => 5,
-                    'conditions'    => array('OR' => array(
-                        'Song.title like'   => '%'.$query.'%',
-                        'Song.band like'    => '%'.$query.'%',
-                        'Song.artist like'  => '%'.$query.'%',
-                        'Song.album like'   => '%'.$query.'%'
-                        )
-                    )
+                    'limit'         => 500,
+                    'conditions'    => $band_condition
                 )
             );
 
             $bands = $this->Paginator->paginate();
             $band_list = array();
-
+            
             foreach ($bands as $band) {
                 $band_list[] = $band['Song']['band'];
             }
-
+            
+            
+            $song_condition = array('AND' => array());
+            foreach($query_params as $query_param)
+            {
+              $query_condition = array(
+                        'Song.title like'   => '%'.$query_param.'%',
+                        'Song.artist like'  => '%'.$query_param.'%',
+                        'Song.album like'   => '%'.$query_param.'%'
+                        );
+                        
+              $song_condition['AND'][] = array('OR' => $query_condition);
+            }
+            
+            $song_condition['AND']['Song.band'] = $band_list;
+            
             $songs = $this->Song->find('all', array(
-                    'fields'        => array('Song.id', 'Song.title', 'Song.album', 'Song.band', 'Song.artist', 'Song.cover', 'Song.playtime', 'Song.track_number', 'Song.year', 'Song.disc', 'Song.genre'),
-                    'conditions'    => array(
-                    'OR' => array(
-                        'Song.title like'   => '%'.$query.'%',
-                        'Song.artist like'  => '%'.$query.'%',
-                        'Song.album like'   => '%'.$query.'%'
-                        ),
-                    'Song.band' => $band_list
-                    )
+                    'fields'        => array('Song.id', 'Song.title', 'Song.album', 'Song.band', 'Song.artist', 'Song.cover', 'Song.playtime', 'Song.track_number', 'Song.year', 'Song.disc', 'Song.genre')
+                  , 'conditions' => $song_condition
                 )
             );
 
@@ -417,6 +440,7 @@ class SongsController extends AppController {
             $songs = $this->SortComponent->sortByBand($songs);
 
             $parsed = array();
+            
             foreach ($songs as $song) {
                 $setsQuantity = preg_split('/\//', $song['Song']['disc']);
 
